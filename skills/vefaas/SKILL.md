@@ -23,18 +23,20 @@ vefaas --version
 
 The typical deployment pattern:
 
-1. **Check CLI**: `vefaas --version` to verify installation
-2. **Check Auth**: `vefaas login --check` to verify login status
-   - If not logged in, run `vefaas login` and select **Volcengine Account (Recommended)**
-3. **Deploy**: `vefaas deploy --newApp <name> --gatewayName $(vefaas run listgateways --first) --yes`
-4. **Access**: `vefaas domains` to view URLs
+1. **Check Node.js**: `node --version` (requires >= 18, recommended 20+)
+   - If version is too low, switch using nvm (`nvm use 20`) or fnm (`fnm use 20`), or manually install a newer version
+2. **Check CLI**: `vefaas --version` to verify installation
+3. **Check Auth**: `vefaas login --check` to verify login status
+   - If not logged in, run `vefaas login --sso` (opens browser, auto-completes when user authorizes - no manual input needed)
+4. **Deploy**: `vefaas deploy --newApp <name> --gatewayName $(vefaas run listgateways --first) --yes`
+5. **Access**: `vefaas domains` to view URLs
 
 ## Quick Commands
 
 | Purpose | Command |
 |---------|---------|
 | Check auth | `vefaas login --check` |
-| Login (SSO) | `vefaas login --sso` (opens browser, **recommended**) |
+| Login (SSO) | `vefaas login --sso` (non-interactive: opens browser, auto-completes when authorized, **recommended**) |
 | Login (AK/SK) | `vefaas login --accessKey <AK> --secretKey <SK>` |
 | Init from template | `vefaas init --template <name>` |
 | Deploy new app | `vefaas deploy --newApp <name> --gatewayName $(vefaas run listgateways --first) --yes` |
