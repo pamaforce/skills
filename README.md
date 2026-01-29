@@ -1,6 +1,6 @@
 # veFaaS Skills
 
-Agent Skills for building on Volcengine veFaaS platform.
+Agent Skills for building on [Volcengine veFaaS](https://www.volcengine.com/product/vefaas) platform.
 
 ## Installation
 
@@ -16,10 +16,11 @@ Clone this repository and copy the skill folders to your agent's skill directory
 
 | Agent | Directory |
 |-------|-----------|
-| Claude Code | `~/.claude/skills/` |
 | OpenCode | `~/.config/opencode/skill/` |
-| OpenAI Codex | `~/.codex/skills/` |
 | Trae | `~/.trae/skills/` |
+| Trae CN | `~/.trae-cn/skills/` |
+| Claude Code | `~/.claude/skills/` |
+| OpenAI Codex | `~/.codex/skills/` |
 
 ## Skills
 
