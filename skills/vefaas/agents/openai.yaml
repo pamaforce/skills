@@ -1,0 +1,4 @@
+interface:
+  display_name: "veFaaS"
+  short_description: "部署和管理火山引擎 veFaaS"
+  default_prompt: "使用 $vefaas 将当前项目部署到火山引擎 veFaaS，并在需要时完成登录、配置和排障。"
