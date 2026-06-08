@@ -5,7 +5,7 @@
 ## 安装
 
 ```bash
-npx skills add vefaas-dev/skills
+npx -y skills add vefaas-dev/skills -g -y
 ```
 
 手动安装时，将 `skills/vefaas` 目录复制到对应 Agent 的 skills 目录下。各主流 Agent 的 skills 目录如下：
@@ -44,11 +44,3 @@ vefaas --version
 ```
 
 必须使用 `@volcengine/vefaas-cli@0.2.0` 或更高版本。旧版本命令形态不同，应先升级再使用本 skill。
-
-## 维护校验
-
-修改 `skills/vefaas` 后，运行：
-
-```bash
-node scripts/validate-vefaas-skill.mjs
-```

@@ -18,9 +18,9 @@ ls -lt ~/.vefaas/logs/ | head -5
 
 | 问题 | 恢复动作 |
 |---|---|
-| CLI 不存在或版本太旧 | `npm i -g @volcengine/vefaas-cli@latest`；要求 0.2.0+ |
-| 鉴权失败 | `vefaas login --check`，再 `vefaas login --sso` 或 AK/SK 登录 |
-| SSO 登录后提示无权操作 APIG 或关联服务 | SSO 授权范围可能不足，建议切换 AK/SK 登录，或让用户前往 Web 控制台完成相关操作 |
+| CLI 不存在或版本太旧 | `npm i -g @volcengine/vefaas-cli@latest`；要求 0.2.0+，并推荐 `vefaas update --check` |
+| 鉴权失败 | `vefaas login --check`，再 `vefaas login --sso` 或 AK/SK 登录；AK/SK 可在 https://console.volcengine.com/iam/keymanage 获取 |
+| SSO 登录后提示无权操作 APIG 或关联服务 | SSO 授权范围可能不足，建议切换 AK/SK 登录并给出 https://console.volcengine.com/iam/keymanage，或让用户前往 Web 控制台完成相关操作 |
 | 不确定是账号、网络还是项目问题 | `vefaas doctor` |
 | 框架检测错误 | `vefaas --debug inspect`，再覆盖 build/start/port |
 | 本地构建失败 | 先本地复现构建命令，安装依赖，确认 Node >= 18 |

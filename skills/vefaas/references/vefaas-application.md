@@ -56,7 +56,7 @@ CLI 创建新应用时，会先创建底层函数，再创建应用并关联该�
 3. gateway name / gateway 实例是否正确。
 4. 当前登录凭据是否具备 APIG 相关权限。
 
-SSO 登录权限不足导致 APIG 操作失败时，引导用户切换 AK/SK 登录，或自行前往 Web 控制台操作。
+SSO 登录权限不足导致 APIG 操作失败时，引导用户切换 AK/SK 登录并给出 https://console.volcengine.com/iam/keymanage，或自行前往 Web 控制台操作。
 
 ### 6. 后续迭代与配置更新
 

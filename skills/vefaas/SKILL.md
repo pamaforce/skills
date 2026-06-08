@@ -1,13 +1,6 @@
 ---
 name: vefaas
-version: 1.0.0
-description: "火山引擎函数服务：当用户想把本地前端、Node.js、Python、静态站点或 API 服务部署上线，基于模板创建 serverless 应用，把已有项目接入 veFaaS，查看线上访问地址，配置生产环境变量、构建命令、启动命令或端口，发布、回滚、调用和调试线上函数，查看日志、实例状态或资源配置，拉取/推送云端函数代码，创建和管理沙箱实例，排查部署失败、鉴权失败、框架检测错误、网关缺失等问题，或需要直接调用 veFaaS OpenAPI 完成高级操作时使用。使用前需确保 @volcengine/vefaas-cli >= 0.2.0。"
-metadata:
-  requires:
-    bins: ["node", "npm", "vefaas"]
-  npmPackage: "@volcengine/vefaas-cli"
-  minimumCliVersion: "0.2.0"
-  cliHelp: "vefaas --help"
+description: "火山引擎函数服务：当用户想把本地前端、Node.js、Python、静态站点或 API 服务部署上线，基于模板创建 serverless 应用，把已有项目接入 veFaaS，查看线上访问地址，配置生产环境变量、构建命令、启动命令或端口，发布、回滚、调用和调试线上函数，查看日志、实例状态或资源配置，拉取/推送云端函数代码，创建和管理沙箱实例，排查部署失败、鉴权失败、框架检测错误、网关缺失等问题，或需要直接调用 veFaaS OpenAPI 完成高级操作时使用。"
 ---
 
 # vefaas
@@ -20,9 +13,10 @@ metadata:
 
 ```bash
 vefaas --version
+vefaas update --check
 ```
 
-如果命令不存在，或版本低于 `0.2.0`，必须先升级：
+如果命令不存在，或版本低于 `0.2.0`，必须先升级；如果 `vefaas update --check` 发现可更新版本，应提示用户升级后再继续：
 
 ```bash
 npm i -g @volcengine/vefaas-cli@latest
@@ -77,6 +71,7 @@ vefaas --version
 | 登录、检查凭据、恢复鉴权 | [认证与凭据](references/vefaas-auth.md) |
 | 初始化模板、部署应用、link、inspect、domains、应用 env/config | [应用工作流](references/vefaas-application.md) |
 | 管理函数、代码、发布、回滚、日志、调用、配置、扩缩容 | [函数管理](references/vefaas-function.md) |
+| 函数 APIG 触发器、沙箱网关路由配置、APIG route 绑定与编辑 | [触发器与 APIG Route](references/vefaas-trigger.md) |
 | 管理 sandbox application / instance | [沙箱管理](references/vefaas-sandbox.md) |
 | 直接调用 veFaaS OpenAPI | [OpenAPI 调用](references/vefaas-openapi.md) |
 | 排查失败、诊断环境 | [故障排查](references/vefaas-troubleshooting.md) |
@@ -130,6 +125,8 @@ vefaas domains
 vefaas env set KEY VALUE
 vefaas fn list -o table
 vefaas fn info --id <function-id>
+vefaas fn invoke --id <function-id> --method GET --path /
+vefaas trigger apig update --route-id <route-id> --path /api --methods GET,POST
 vefaas sandbox instance create --id <sandbox-application-id>
 vefaas api ListFunctions --PageSize 10 -o table
 ```

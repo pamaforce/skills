@@ -12,3 +12,6 @@ node_modules/
 .sonarlint
 yarn.lock
 package-lock.json
+
+# Local development helpers
+scripts/
