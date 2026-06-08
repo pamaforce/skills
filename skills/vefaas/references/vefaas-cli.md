@@ -12,6 +12,7 @@ vefaas --version
 ## 版本规则
 
 - `vefaas --version` 必须 >= `0.2.0` 才继续执行本 skill 中的工作流。
+- 推荐同时执行 `vefaas update --check` 检查可用更新；如果当前版本落后，提示用户升级后再继续。
 - 如果 CLI 版本更旧，先升级，不要尝试兼容旧命令。
 - 命令或 flag 不确定时，以当前 `vefaas --help` / `vefaas <command> --help` 为准。
 

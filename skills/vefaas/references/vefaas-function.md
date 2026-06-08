@@ -65,15 +65,35 @@ CLI 用户通常会在本地管理函数代码。已有函数可以用 `vefaas f
 
 ### 5. 测试调用
 
-发布后先用 `vefaas fn invoke` 做测试调用。事件函数通常传入事件 payload；HTTP/Webserver 形态可以用 method、path、header/body 或 request JSON 模拟 APIG 请求。
+发布后先用 `vefaas fn invoke` 做测试调用。Invoke 是函数 TestInvoke 调用，不依赖触发器；即使函数没有绑定 APIG、Timer 或其他触发器，也可以 invoke 测试函数。
 
-如果调用失败，先看错误信息、函数实例状态和日志，再决定是否修改配置、重新发布或回滚。
+事件函数通常传入事件 payload：
+
+```bash
+vefaas fn invoke --id <function-id> --data '{"hello":"vefaas"}'
+```
+
+HTTP/Webserver 形态可以用 method、path、header/body 或 request JSON 模拟 HTTP 请求。这里的 APIG-shaped 参数只是测试调用参数格式，不代表线上已经存在 APIG route：
+
+```bash
+vefaas fn invoke --id <function-id> --method GET --path /v1/ping
+vefaas fn invoke --id <function-id> --method POST --path /api --header 'content-type=application/json' --data '{"x":1}'
+vefaas fn invoke --id <function-id> --requestJson '{"data":{},"method":"GET","path":"/","headers":{}}'
+```
+
+调试实例调用：
+
+```bash
+vefaas fn invoke --id <function-id> --method GET --path / --debug-instance
+```
+
+`--debug-instance` 会注入 `x-faas-debug-instance=true`。不要手写这个 header，除非用户明确要求复现底层请求。
+
+如果调用失败，先看错误信息、函数实例状态和日志，再决定是否修改配置、重新发布或回滚。调用返回 `ResourceNotFound` 时，先判断是否是账号/环境不一致：用 `vefaas login --check` 确认登录方式和环境，用 `vefaas fn info --id <function-id>` 或 `vefaas fn list --fields Id,Name --limit 20` 确认当前账号是否能看到该函数。
 
 ### 6. 绑定触发器并对外访问
 
-如果函数需要对外提供访问地址，需要绑定触发器。目前 CLI 的触发器高阶命令只支持 APIG 触发器，基于已有 gateway 实例创建或关联 APIG 资源。操作前先查看 `vefaas fn trigger --help` 和 `vefaas fn trigger apig --help`。
-
-绑定 APIG 触发器后，通过生成的访问地址请求函数。若触发器绑定报 APIG 权限不足，常见原因是当前 SSO 登录权限域不足，可提示用户切换 AK/SK 登录或到 Web 控制台操作。
+如果函数需要对外提供访问地址，需要绑定触发器。目前 CLI 的触发器高阶命令主要覆盖 APIG 触发器，基于已有 gateway 实例创建或关联 APIG 资源。绑定、编辑 route、确认访问 URL、处理 APIG 权限不足等操作必须先读 [触发器与 APIG Route](vefaas-trigger.md)。
 
 ### 7. 查看实例日志排障
 
