@@ -17,9 +17,65 @@
 
 ### 1. 选择或预热镜像
 
-创建沙箱应用前，必须先确认可用镜像。公共镜像可以按 image type / image group 选择；私有镜像需要先预热，预热成功后再用于创建沙箱应用。
+创建沙箱应用前，必须先确认可用镜像。沙箱镜像列表只表示“已经预热、可以直接用于创建沙箱”的镜像，不等同于用户 CR 里的全部容器镜像。
 
-常用入口是 `vefaas sandbox images`、`vefaas sandbox images list`、`vefaas sandbox images groups` 和 `vefaas sandbox images precache`。不确定镜像参数时，先看 `vefaas sandbox images --help`，不要直接用未预热镜像创建沙箱应用。
+沙箱镜像分两类：
+
+- **公有镜像**：平台提供并已预热的镜像，可按 image group / status / image URL / image ID 查询。适合快速创建沙箱应用。
+- **私有镜像**：用户自己提交过预热任务并已进入沙箱镜像列表的镜像。只有预热成功后，才适合用于创建沙箱应用。
+
+查询已预热镜像时，只给用户推荐最短路径：
+
+```bash
+vefaas sandbox images public
+vefaas sandbox images private
+```
+
+需要按类别、状态、镜像地址或 ID 过滤时，再查看 `vefaas sandbox images public --help` 或 `vefaas sandbox images private --help` 后补充参数；不要把所有过滤命令一次性塞给用户。
+
+如果用户已经给出完整镜像地址，可以直接提交预热；提交后用私有镜像列表观察 `caching` / `success` / `failed` 状态：
+
+```bash
+vefaas sandbox images precache <image-url>
+vefaas sandbox images private --status success
+```
+
+如果用户想从火山引擎 CR 里选择镜像，先按控制台同样的层级逐步缩小范围：registry -> namespace -> repository -> tag。`vefaas cr` 只浏览用户 CR 里的原始镜像，不会预热；只有提交 sandbox 预热并成功后，镜像才会出现在 `vefaas sandbox images private` 中。不要一次性列出所有 CR 子命令；先从 registry 或 `cr --help` 开始：
+
+```bash
+vefaas cr registries
+vefaas cr --help
+```
+
+从 CR 选择镜像并预热到 sandbox 时，先用 `vefaas cr tags` 找到镜像 tag，拼出完整镜像 URL，再用通用预热入口提交：
+
+```bash
+vefaas cr tags --registry <registry> --namespace <namespace> --repository <repository>
+vefaas sandbox images precache <image-url> --registry <registry>
+```
+
+CR tag 列表默认只展示 Linux/amd64 镜像。除非用户明确知道镜像架构和平台限制，不要引导使用非 Linux/amd64 镜像。
+
+CLI 在提交 CR 镜像预热前会先调用 `GetImageConfig` 验证镜像可访问性。只有 `GetImageConfig` 超时、镜像地址看似无效或提示 internal service timeout 时，才可能需要 CR VPC tunnel；不要仅根据 registry 类型或 tunnel 查询状态判断。遇到这类问题时，带上具体镜像地址检查，确认需要后再打通：
+
+```bash
+vefaas cr tunnel --registry <registry> --image-url <image-url>
+vefaas cr tunnel --registry <registry> --image-url <image-url> --enable --wait
+```
+
+也可以让预热命令仅在 `GetImageConfig` 判定需要时自动尝试打通：
+
+```bash
+vefaas sandbox images precache <image-url> --registry <registry> --enable-cr-tunnel
+```
+
+如果 `GetImageConfig` 成功，直接提交预热，不要执行 tunnel enable；部分 registry 类型不支持该操作。
+
+删除沙箱镜像指删除“沙箱镜像预热记录”，不是删除用户 CR 仓库里的原始镜像。删除前必须确认 image ID；如果预热记录已被沙箱应用引用，CLI 会返回正在使用它的沙箱应用，先处理相关沙箱应用后再删除：
+
+```bash
+vefaas sandbox images delete --id <image-id> --yes
+```
 
 ### 2. 创建沙箱应用
 
@@ -78,4 +134,4 @@ vefaas sandbox create --name <sandbox-name> --image <image-url> --gateway-name <
 5. 通过实例日志或 WebShell 排查启动失败、端口错误、依赖缺失、权限或业务逻辑问题。
 6. 必要时更新沙箱应用配置并发布新 revision，再创建新实例验证。
 
-删除沙箱应用、删除镜像、kill/pause/resume 实例都可能影响正在运行的任务，执行前必须确认资源 ID 和用户意图。
+删除沙箱应用、删除镜像预热记录、kill/pause/resume 实例都可能影响正在运行的任务，执行前必须确认资源 ID 和用户意图。

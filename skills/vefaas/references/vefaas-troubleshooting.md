@@ -20,7 +20,8 @@ ls -lt ~/.vefaas/logs/ | head -5
 |---|---|
 | CLI 不存在或版本太旧 | `npm i -g @volcengine/vefaas-cli@latest`；要求 0.2.0+，并推荐 `vefaas update --check` |
 | 鉴权失败 | `vefaas login --check`，再 `vefaas login --sso` 或 AK/SK 登录；AK/SK 可在 https://console.volcengine.com/iam/keymanage 获取 |
-| SSO 登录后提示无权操作 APIG 或关联服务 | SSO 授权范围可能不足，建议切换 AK/SK 登录并给出 https://console.volcengine.com/iam/keymanage，或让用户前往 Web 控制台完成相关操作 |
+| SSO 登录后提示无权操作 APIG、CR 或关联服务 | SSO 授权范围可能不足，建议切换 AK/SK 登录并给出 https://console.volcengine.com/iam/keymanage，或让用户前往 Web 控制台完成相关操作 |
+| 调用 `vefaas cr registries` 等命令提示 `Target:"cr"` / `ListRegistries` 权限不足 | 不要反复重试同一凭据；SSO 用户先切 AK/SK，AK/SK 仍失败时联系管理员补充 Container Registry（CR）OpenAPI 权限 |
 | 不确定是账号、网络还是项目问题 | `vefaas doctor` |
 | 框架检测错误 | `vefaas --debug inspect`，再覆盖 build/start/port |
 | 本地构建失败 | 先本地复现构建命令，安装依赖，确认 Node >= 18 |
