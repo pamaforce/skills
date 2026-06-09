@@ -33,6 +33,21 @@
 
 使用 CLI 创建函数时，可以从本地目录、zip、TOS 或镜像创建。交互式创建或模板化创建通常会生成/携带一份默认代码；后续常见流程是在本地修改代码，再用 `vefaas fn push` 上传更新，或用 `vefaas deploy --funcId <function-id>` 完成构建、上传和发布链路。
 
+函数镜像 source 直接来自用户 CR，不走沙箱预热镜像。需要从 CR 选择镜像时，优先使用 `vefaas fn create --source-type image`，CLI 会按 registry -> namespace -> repository -> tag 选择，并读取镜像配置回填启动命令、端口和环境变量。需要先浏览 CR 原始镜像时，从 `vefaas cr registries` 或 `vefaas cr --help` 开始；这里不会触发沙箱预热。函数镜像当前只支持 `linux/amd64`；遇到非支持架构 tag 时，应换一个 tag 或重新构建镜像。
+
+如果浏览 CR 时遇到 `AccessDenied: API access denied`，且错误中包含 `Target:"cr"`、`Action:"ListRegistries"` / `ListNamespaces` / `ListRepositories` / `ListTags`，不要反复重试同一个凭据。SSO 登录通常需要切换 AK/SK；AK/SK 仍失败时，让用户联系管理员补充 Container Registry（CR）OpenAPI 权限。AK/SK 管理页：https://console.volcengine.com/iam/keymanage
+
+CR 镜像选择后，CLI 会先调用 `GetImageConfig` 读取镜像配置。只有它超时、镜像地址看似无效或提示 internal service timeout 时，才可能需要 CR VPC tunnel；不要仅根据 registry 类型或 tunnel 查询状态判断。此时带上具体镜像地址检查，确认需要后再启用：
+
+```bash
+vefaas cr tunnel --registry <registry> --image-url <image-url>
+vefaas cr tunnel --registry <registry> --image-url <image-url> --enable --wait
+```
+
+如果 `GetImageConfig` 成功，直接创建函数，不要执行 tunnel enable；部分 registry 类型不支持该操作。
+
+镜像函数创建后，平台会异步同步并缓存 source image。镜像同步完成前不能发布 revision；如果刚创建完立刻发布遇到 `Source image sync is in Running status`，这通常表示需要等待，不代表函数创建失败。`vefaas fn release` 会自动查询 `GetImageSyncStatus` 并等待镜像同步和缓存就绪；也可用 `vefaas fn info --id <function-id>` 查看 `ImageSyncStatus`、`ImageCacheStatus` 和 `ImageReadyForRelease`。
+
 ## 常见使用流程
 
 ### 1. 定位或创建函数
@@ -45,11 +60,15 @@
 - 镜像 source：适合已有完整容器镜像的服务。
 - TOS source：适合已有代码包上传位置的场景。
 
+如果用户要从 CR 创建纯镜像函数，用 `vefaas fn create --source-type image` 进入交互选择；非交互时可传 `--cr-registry`、`--cr-namespace`、`--cr-repository` 和可选 `--cr-tag`。具体参数以 `vefaas fn create --help` 为准。
+
 ### 2. 本地修改并推送代码
 
 CLI 用户通常会在本地管理函数代码。已有函数可以用 `vefaas fn pull` 拉取代码到本地；镜像类型函数不支持这种代码拉取方式。
 
 修改代码后，如果只想上传代码包，用 `vefaas fn push`。`push` 只负责上传，不等同于发布上线；用户说“发布、上线、部署”时，应继续执行发布动作，或使用 `vefaas deploy --funcId <function-id>` 走完整部署链路。
+
+纯镜像函数不涉及代码包，不能使用 `fn push`；创建或更新镜像函数后直接执行 `vefaas fn release`，CLI 会先等待镜像同步和缓存就绪。
 
 ### 3. 更新函数配置
 
@@ -61,7 +80,7 @@ CLI 用户通常会在本地管理函数代码。已有函数可以用 `vefaas f
 
 代码上传后，如 runtime 或代码包需要云端依赖安装，使用 `vefaas fn deps` 相关命令确认依赖安装成功。依赖安装能力和参数可能随 source/runtime 不同而变化，先看 `vefaas fn deps --help`。
 
-确认代码和配置无误后，用 `vefaas fn release` 发布新 revision。发布后可用 `vefaas fn revision` 查看版本信息。若发布后发现问题，用 `vefaas fn rollback` 回滚到指定 revision；回滚前必须确认函数 ID 和目标 revision number。
+确认代码和配置无误后，用 `vefaas fn release` 发布新 revision。镜像函数发布前会自动等待 source image 同步和缓存就绪；如果同步失败，先用 `vefaas fn info --id <function-id>` 查看状态并检查镜像地址、权限和 CR 可访问性。发布后可用 `vefaas fn revision` 查看版本信息。若发布后发现问题，用 `vefaas fn rollback` 回滚到指定 revision；回滚前必须确认函数 ID 和目标 revision number。
 
 ### 5. 测试调用
 
