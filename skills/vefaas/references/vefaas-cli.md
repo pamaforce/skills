@@ -1,6 +1,6 @@
 # CLI 与版本
 
-本 skill 只面向 `@volcengine/vefaas-cli` 0.2.0 及以上版本。
+本 skill 只面向 `@volcengine/vefaas-cli` 0.2.4 及以上版本。
 
 ## 安装或升级
 
@@ -11,9 +11,11 @@ vefaas --version
 
 ## 版本规则
 
-- `vefaas --version` 必须 >= `0.2.0` 才继续执行本 skill 中的工作流。
+- `vefaas --version` 必须 >= `0.2.4` 才继续执行本 skill 中的工作流。
 - 推荐同时执行 `vefaas update --check` 检查可用更新；如果当前版本落后，提示用户升级后再继续。
+- 升级 CLI 后，建议同步更新本 skill：`npx -y skills add vefaas-dev/skills -g -y`。
 - 如果 CLI 版本更旧，先升级，不要尝试兼容旧命令。
+- 如果缺少 `app`、`overview`、`resource`、`whoami` 等命令，先升级 CLI，并同步更新本 skill。
 - 命令或 flag 不确定时，以当前 `vefaas --help` / `vefaas <command> --help` 为准。
 
 ## 资源模型
@@ -71,8 +73,11 @@ vefaas --version
 
 ```bash
 vefaas function <command>        # alias: fn
+vefaas application <command>     # alias: app
 vefaas sandbox <command>
 vefaas gateway <command>
+vefaas resource <command>        # alias: res
+vefaas overview
 vefaas deploy
 vefaas pull
 vefaas push
@@ -81,6 +86,7 @@ vefaas init
 vefaas link
 vefaas login
 vefaas logout
+vefaas whoami
 vefaas api [action]
 vefaas config [action]
 vefaas domains
@@ -90,3 +96,15 @@ vefaas generateCaddy
 vefaas update
 vefaas completion <command>
 ```
+
+## Console 视角查询
+
+以下命令不是单个 Application 的生命周期操作，而是偏 Console/账号维度的只读查询：
+
+```bash
+vefaas overview
+vefaas resource list
+```
+
+- `overview` 适合快速查看控制台概览类数据。
+- `resource summary/list` 适合查询资源分配和使用情况；`resource` 也可写成 `res`，裸 `vefaas res` 默认展示 summary。

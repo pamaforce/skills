@@ -9,14 +9,14 @@ description: "火山引擎函数服务：当用户想把本地前端、Node.js�
 
 ## 前置要求
 
-**CRITICAL — 执行任何 veFaaS 操作前，MUST 先确认本机 `vefaas` CLI 版本 >= 0.2.0。**
+**CRITICAL — 执行任何 veFaaS 操作前，MUST 先确认本机 `vefaas` CLI 版本 >= 0.2.4。**
 
 ```bash
 vefaas --version
 vefaas update --check
 ```
 
-如果命令不存在，或版本低于 `0.2.0`，必须先升级；如果 `vefaas update --check` 发现可更新版本，应提示用户升级后再继续：
+如果命令不存在，或版本低于 `0.2.4`，必须先升级；如果 `vefaas update --check` 发现可更新版本，应提示用户升级后再继续：
 
 ```bash
 npm i -g @volcengine/vefaas-cli@latest
@@ -29,8 +29,9 @@ vefaas --version
 
 - 用户要把本地项目、网站、API 服务、Node.js 服务、Python 服务或静态站点部署到火山引擎 veFaaS。
 - 用户要基于模板创建 serverless 应用，或把已有项目接入 veFaaS。
-- 用户要查看线上访问地址、配置环境变量、调整构建命令、启动命令、端口或资源配置。
-- 用户要管理线上函数：创建、查看、发布、回滚、调用、日志、实例、扩缩容、触发器、依赖、WebShell。
+- 用户要查看控制台概览、线上访问地址、发布记录、日志或资源用量。
+- 用户要配置环境变量、调整构建命令、启动命令、端口或资源配置，或删除已有应用。
+- 用户要管理线上函数：创建、查看、发布、回滚、调用、日志、实例、任务、扩缩容策略、触发器、依赖、WebShell。
 - 用户要拉取云端函数代码、本地修改后推送或重新部署。
 - 用户要管理沙箱应用、沙箱实例、沙箱镜像、沙箱日志、沙箱 WebShell。
 - 用户要排查部署失败、鉴权失败、框架检测错误、网关缺失、配置不一致或 OpenAPI 调用失败。
@@ -47,7 +48,7 @@ vefaas --version
 
 **CRITICAL — 用户说“部署项目 / 网站上线 / API 上线 / serverless 应用 / 查看访问地址”时，默认走应用工作流，不要直接创建函数。**
 
-应用工作流使用 `vefaas init`、`vefaas inspect`、`vefaas link`、`vefaas deploy`、`vefaas domains`、`vefaas env`、`vefaas config`。继续前 MUST 读取 [应用工作流](references/vefaas-application.md)。
+应用工作流使用 `vefaas init`、`vefaas inspect`、`vefaas link`、`vefaas deploy`、`vefaas domains`、`vefaas env`、`vefaas config`、`vefaas app`、`vefaas overview`、`vefaas resource`。继续前 MUST 读取 [应用工作流](references/vefaas-application.md)。
 
 **CRITICAL — 只有用户给出已有函数 ID/name，或明确说“函数 / function / fn / 拉取函数代码 / 发布函数 / 回滚函数 / 函数日志”时，才走函数工作流。**
 
@@ -89,7 +90,7 @@ vefaas --version
 
 以下操作会影响线上行为或销毁资源，执行前必须确认目标资源和用户意图：
 
-- 删除函数、删除沙箱应用、删除沙箱镜像。
+- 删除应用、删除函数、删除沙箱应用、删除沙箱镜像。
 - kill / pause / resume sandbox instance。
 - 函数或沙箱 rollback。
 - 修改生产环境触发器等。
@@ -100,6 +101,8 @@ vefaas --version
 2. 如果目标不唯一或来源只是用户口述名称，先 list/info 消歧。
 3. 用户明确确认后再执行；不要静默添加 `--yes` 绕过确认。
 4. 用户拒绝或目标不清楚时停止，不要自行猜测替代目标。
+
+**应用删除特殊规则：** 删除 veFaaS Application 前先执行 `vefaas app delete --id <app-id> --check -o json` 做前置检查。若检查发现 APIG/NAT/EIP 等共享或可能持续计费资源，非交互场景必须显式传 `--ack-shared-resources`；不要用全局 `--yes` 代替这类风险确认。只有用户明确接受跳过前置阻塞时，才使用 `--force --yes`，并说明关联资源可能不会被自动清理。
 
 ## 目标消歧规则
 
@@ -114,13 +117,18 @@ vefaas --version
 ```bash
 vefaas --help
 vefaas doctor
+vefaas whoami
 vefaas login --sso
 vefaas login --check
+vefaas overview
+vefaas resource
 vefaas init
 vefaas inspect
 vefaas gateway list --first
 vefaas link --newApp <name> --gatewayName <gateway-name> --yes
 vefaas deploy
+vefaas app list -o table
+vefaas app delete --id <app-id> --check -o json
 vefaas domains
 vefaas env set KEY VALUE
 vefaas fn list -o table

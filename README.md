@@ -2,11 +2,13 @@
 
 用于指导 AI Agent 使用 [Volcengine veFaaS](https://www.volcengine.com/product/vefaas) 和 `@volcengine/vefaas-cli` 的 Skills。
 
-## 安装
+## 安装或更新
 
 ```bash
 npx -y skills add vefaas-dev/skills -g -y
 ```
+
+用户端更新 skills 时，重复执行上面的命令即可。建议在升级 `@volcengine/vefaas-cli` 后同步更新本 skill，避免 Agent 仍按旧命令形态调用 CLI。
 
 手动安装时，将 `skills/vefaas` 目录复制到对应 Agent 的 skills 目录下。各主流 Agent 的 skills 目录如下：
 
@@ -43,4 +45,8 @@ npm i -g @volcengine/vefaas-cli@latest
 vefaas --version
 ```
 
-必须使用 `@volcengine/vefaas-cli@0.2.0` 或更高版本。旧版本命令形态不同，应先升级再使用本 skill。
+必须使用 `@volcengine/vefaas-cli@0.2.4` 或更高版本。旧版本命令形态不同，应先升级再使用本 skill。升级 CLI 后，也建议同步更新 skills：
+
+```bash
+npx -y skills add vefaas-dev/skills -g -y
+```

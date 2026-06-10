@@ -4,7 +4,7 @@
 
 ## Function 模型
 
-函数是 veFaaS（函数服务）的核心资源，承载代码或镜像、运行时、启动命令、端口、环境变量、CPU/内存、并发、超时、触发器、版本、实例、日志和监控。
+函数是 veFaaS（函数服务）的核心资源，承载代码或镜像、运行时、启动命令、端口、环境变量、CPU/内存、并发、超时、触发器、版本、实例、任务、日志和监控。
 
 - **Function**：函数资源本身，是用户主要创建和管理的对象。
 - **Revision**：函数代码/镜像和配置形成的版本快照，发布、回滚围绕 revision 展开。
@@ -112,9 +112,24 @@ vefaas fn invoke --id <function-id> --method GET --path / --debug-instance
 
 ### 6. 绑定触发器并对外访问
 
-如果函数需要对外提供访问地址，需要绑定触发器。目前 CLI 的触发器高阶命令主要覆盖 APIG 触发器，基于已有 gateway 实例创建或关联 APIG 资源。绑定、编辑 route、确认访问 URL、处理 APIG 权限不足等操作必须先读 [触发器与 APIG Route](vefaas-trigger.md)。
+如果函数需要对外提供访问地址，需要绑定 APIG 触发器，基于已有 gateway 实例创建或关联 APIG 资源。Timer、Kafka、RocketMQ、BMQ、TLS 这类函数触发器也有类型化 CRUD 命令；TOS 仍属于跨服务 Bucket Notification 场景，不要假设高阶命令已覆盖。绑定、编辑 route、确认访问 URL、处理 APIG 权限不足或管理非 APIG 触发器前，必须先读 [触发器与 APIG Route](vefaas-trigger.md)。
 
-### 7. 查看实例日志排障
+### 7. 任务、发布记录与扩缩容策略
+
+异步任务、发布记录和扩缩容策略已经有高阶命令，优先查 help 后再执行写操作：
+
+```bash
+vefaas fn task list --id <function-id> -o table
+vefaas fn task terminate --id <function-id> --task-id <task-id>
+vefaas fn release-record list --id <function-id> -o table
+vefaas fn release-record status --id <function-id> --record-id <record-id>
+vefaas fn strategy elastic list --id <function-id> -o table
+vefaas fn strategy cron list --id <function-id> -o table
+```
+
+更新弹性策略、创建/更新/删除定时策略会影响线上实例容量和成本。执行前先确认函数 ID、当前策略和预期变更；复杂 payload 不要猜字段，先运行 `vefaas fn strategy --help`、`vefaas fn strategy elastic --help` 或 `vefaas fn strategy cron --help`。
+
+### 8. 查看实例日志排障
 
 线上请求异常时，先用 `vefaas fn instances` 找到相关实例，再用 `vefaas fn logs` 查看实例日志。需要进入运行环境排查时，可用 `vefaas fn webshell`，但应避免泄露日志、环境变量或连接串中的敏感信息。
 

@@ -7,6 +7,7 @@
 先读本页：
 
 - 用户要绑定 APIG 触发器、查看触发器、创建访问入口。
+- 用户要管理 Timer、Kafka、RocketMQ、BMQ、TLS 等函数触发器。
 - 用户要修改 APIG route 的 path、method、timeout、CORS 或完整 MatchRule / AdvancedSetting。
 - 用户遇到 APIG 权限不足、route 找不到、函数 ID 不存在、访问地址不可用。
 - 用户需要线上 HTTP 访问入口，而不只是 TestInvoke 测试。单纯测试函数调用属于函数管理流程，不需要先绑定触发器。
@@ -89,6 +90,21 @@ vefaas trigger apig update --route-id <route-id> --advanced-setting-json '{"Time
 ```
 
 CLI 会清理空的 `Header` / `QueryString` 匹配项。复杂 APIG 能力如果高阶命令无法覆盖，再读 [OpenAPI 调用](vefaas-openapi.md)，并使用 `vefaas api <Action> --service apig --api-version 2022-11-12 --help` 查看字段。
+
+## 非 APIG 函数触发器
+
+Timer、Kafka、RocketMQ、BMQ、TLS 触发器使用类型化子命令管理。复杂配置优先放在 JSON 文件里，并用 `--body @file.json` 传入；也支持直接 JSON 字符串或从 stdin 读取，具体以 help 为准。
+
+```bash
+vefaas fn trigger timer create --id <function-id> --body @timer.json
+vefaas fn trigger kafka get --id <function-id> --trigger-id <trigger-id> -o json
+vefaas fn trigger rocketmq update --id <function-id> --trigger-id <trigger-id> --body @trigger.json
+vefaas fn trigger tls delete --id <function-id> --trigger-id <trigger-id>
+```
+
+写操作前先用 `vefaas fn trigger list --id <function-id> -o json` 确认当前触发器 ID、类型和配置。删除或更新生产触发器前必须向用户展示目标 trigger ID 和影响。
+
+TOS 触发器涉及 TOS Bucket Notification 等跨服务配置，当前不要把它当作普通函数触发器 CRUD；需要时先确认控制台语义，再走 OpenAPI 或提示用户在控制台处理。
 
 ## 排障顺序
 

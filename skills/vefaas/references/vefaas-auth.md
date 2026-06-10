@@ -8,6 +8,7 @@ vefaas login --sso
 vefaas login --accessKey <AK> --secretKey <SK>
 vefaas login --accessKey <AK> --secretKey <SK> --sessionToken <STS>
 vefaas login --token <OIDC-or-OAuth-token>
+vefaas whoami
 vefaas logout
 vefaas doctor
 ```
@@ -24,7 +25,7 @@ AK/SK 可在火山引擎 IAM Access Key 管理页创建或查看：https://conso
 
 ## Agent 规则
 
-- 执行需要访问云端资源的命令前，优先用 `vefaas login --check` 检查凭据。
+- 执行需要访问云端资源的命令前，优先用 `vefaas login --check` 或 `vefaas whoami` 检查凭据。
 - 用户没有 AK/SK 时，优先引导 `vefaas login --sso`。
 - 因权限不足建议切换 AK/SK 时，同时给出 IAM Access Key 管理页，说明可在那里创建或查看 AK/SK。
 - `vefaas login --sso` 会返回浏览器登录链接，同时 CLI 会在本地启动监听服务并等待浏览器回调；不要把它当成一次性 token 输入流程。
@@ -59,4 +60,5 @@ AK/SK 可在火山引擎 IAM Access Key 管理页创建或查看：https://conso
 | SSO 登录后提示无权操作 APIG、CR 或关联服务 | 提示 SSO 授权范围可能不足，建议切换 AK/SK 登录，并给出 https://console.volcengine.com/iam/keymanage |
 | AK/SK 调 CR 仍提示 `Target:"cr"` / `ListRegistries` 等权限不足 | 提示联系管理员补充 Container Registry（CR）OpenAPI 权限 |
 | 切换凭据后资源 not found | 重新 `vefaas fn list/info`、`vefaas gateway list` 定位资源，确认 region |
+| 不确定当前登录身份 | `vefaas whoami` 或 `vefaas login --check` |
 | 不确定是凭据、网络还是项目问题 | `vefaas doctor` |

@@ -6,6 +6,7 @@
 
 - [Application 模型](#application-模型)
 - [常见使用流程](#常见使用流程)
+- [应用查询与管理](#应用查询与管理)
 
 ## Application 模型
 
@@ -75,3 +76,34 @@ SSO 登录权限不足导致 APIG 操作失败时，引导用户切换 AK/SK 登
 5. 如服务启动或请求异常，再查看底层函数实例与日志。
 
 涉及删除、覆盖环境变量、修改生产构建配置或重新绑定应用时，先确认应用 ID、目标环境和用户意图。
+
+## 应用查询与管理
+
+应用已经存在时，不一定需要回到本地项目目录。应用维度的只读查询优先用 `vefaas app`：
+
+```bash
+vefaas app list -o table
+vefaas app info --id <app-id> -o json
+vefaas app release --id <app-id> -o table
+vefaas app revisions --id <app-id> -o table
+vefaas app logs --id <app-id>
+```
+
+`overview`、`resource` 是 Console/账号维度查询能力，不属于单个 Application 的生命周期；需要这些能力时读 [CLI 与版本](vefaas-cli.md) 的 Console 视角查询。
+
+### 删除应用
+
+删除应用是高风险操作，不能直接把 `--yes` 当成所有风险的确认。先做前置检查：
+
+```bash
+vefaas app delete --id <app-id> --check -o json
+```
+
+检查会提示应用是否正在部署/删除、是否存在沙箱实例、Ark 触发器、Coze Terraform Stack、Computer Use Agent ECS，以及 APIG/NAT/EIP 等共享或可能持续计费资源。
+
+处理规则：
+
+1. 先向用户展示应用 ID 和检查结果摘要，再决定是否删除。
+2. 如果检查发现 APIG/NAT/EIP 等共享或可能持续计费资源，非交互删除必须显式加 `--ack-shared-resources`。
+3. 只有用户明确接受跳过前置阻塞时，才使用 `--force --yes`；此时要说明关联资源可能不会被自动清理。
+4. 如果只是想验证能否删除，停在 `--check -o json`，不要继续执行真实删除。
