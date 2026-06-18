@@ -18,7 +18,7 @@ ls -lt ~/.vefaas/logs/ | head -5
 
 | 问题 | 恢复动作 |
 |---|---|
-| CLI 不存在或版本太旧 | `npm i -g @volcengine/vefaas-cli@latest`；要求 0.2.4+，并推荐 `vefaas update --check` |
+| CLI 不存在或版本太旧 | `npm i -g @volcengine/vefaas-cli@latest`；要求 0.2.7+，并推荐 `vefaas update --check` |
 | 鉴权失败 | `vefaas login --check`，再 `vefaas login --sso` 或 AK/SK 登录；AK/SK 可在 https://console.volcengine.com/iam/keymanage 获取 |
 | SSO 登录后提示无权操作 APIG、CR 或关联服务 | SSO 授权范围可能不足，建议切换 AK/SK 登录并给出 https://console.volcengine.com/iam/keymanage，或让用户前往 Web 控制台完成相关操作 |
 | 调用 `vefaas cr registries` 等命令提示 `Target:"cr"` / `ListRegistries` 权限不足 | 不要反复重试同一凭据；SSO 用户先切 AK/SK，AK/SK 仍失败时联系管理员补充 Container Registry（CR）OpenAPI 权限 |

@@ -45,7 +45,7 @@ npm i -g @volcengine/vefaas-cli@latest
 vefaas --version
 ```
 
-必须使用 `@volcengine/vefaas-cli@0.2.4` 或更高版本。旧版本命令形态不同，应先升级再使用本 skill。升级 CLI 后，也建议同步更新 skills：
+必须使用 `@volcengine/vefaas-cli@0.2.7` 或更高版本。旧版本命令形态不同，应先升级再使用本 skill。升级 CLI 后，也建议同步更新 skills：
 
 ```bash
 npx -y skills add vefaas-dev/skills -g -y

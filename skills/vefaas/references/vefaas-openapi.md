@@ -24,6 +24,12 @@ vefaas api ListFunctions --PageSize 10 -o table
 vefaas api GetFunction --Id <function-id> --output json
 ```
 
+也可以用 doc 命令辅助（**免登录**），开发接入场景尤其方便：
+
+- `vefaas doc api` 列出官网有文档页的 Action（按官网分类）；`vefaas doc api <Action> -o json` 读 `data.markdown` 拿该接口的**官网文档**（参数表 / 示例 / 返回值 / 错误码）。官网未收录的接口（apig/cr 等）→ `vefaas api <Action> --help` 看本地 catalog 字段。
+- 写 SDK 集成代码：`vefaas doc sdk methods <Action> -o json` 读 `data.fields[]`（`name/type/required/describe`，含嵌套 `subFields`），`--lang go|python|node|java|php` 拿该语言的请求示例骨架。
+- 详见 [文档检索与 doc-first](vefaas-docs.md)。
+
 ## Service 与 Version
 
 `vefaas api` 会按 Action 自动推断 OpenAPI service 和 Version；需要诊断或调用跨服务 Action 时，可以显式指定：

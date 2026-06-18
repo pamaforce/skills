@@ -1,7 +1,5 @@
 # CLI 与版本
 
-本 skill 只面向 `@volcengine/vefaas-cli` 0.2.4 及以上版本。
-
 ## 安装或升级
 
 ```bash
@@ -11,7 +9,6 @@ vefaas --version
 
 ## 版本规则
 
-- `vefaas --version` 必须 >= `0.2.4` 才继续执行本 skill 中的工作流。
 - 推荐同时执行 `vefaas update --check` 检查可用更新；如果当前版本落后，提示用户升级后再继续。
 - 升级 CLI 后，建议同步更新本 skill：`npx -y skills add vefaas-dev/skills -g -y`。
 - 如果 CLI 版本更旧，先升级，不要尝试兼容旧命令。
